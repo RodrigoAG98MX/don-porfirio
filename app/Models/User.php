@@ -1,0 +1,93 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable, HasUlids, SoftDeletes, HasRoles;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'telephone',
+        'nss',
+        'rfc',
+        'salary',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    public function address()
+    {
+        return $this->morphOne(Adress::class, 'model');
+    }
+
+    public static function modelData()
+    {
+        return [
+            [
+                'key' => 'name',
+                'title' => 'Nombre',
+                'align' => 'center',
+                'sortable' => false
+            ],
+            [
+                'key' => 'email',
+                'title' => 'Correo',
+                'align' => 'center',
+                'sortable' => false
+            ],
+            [
+                'key' => 'telephone',
+                'title' => 'Teléfono',
+                'align' => 'center',
+                'sortable' => false
+            ],
+            [
+                'key' => 'rfc',
+                'title' => 'RFC',
+                'align' => 'center',
+                'sortable' => false
+            ],
+            [
+                'key' => 'actions',
+                'title' => '...',
+                'align' => 'center',
+                'sortable' => false
+            ],
+        ];
+    }
+}
