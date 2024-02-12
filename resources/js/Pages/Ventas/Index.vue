@@ -20,8 +20,16 @@ const data = reactive({
         mesa: '',
         platillo: '',
         platillo_count: 1,
-        platillos: []
-    })
+        platillos: [],
+        date: new Date(),
+        hr: 0,
+        min: 0,
+        propina: 0,
+        total: 0,
+        amount: 0
+    }),
+    platillos: [],
+    tables: [],
 });
 
 const snakbar = reactive({
@@ -31,6 +39,7 @@ const snakbar = reactive({
     color: '',
 })
 
+//TODO: Almaenar venta en el back_end
 function saveVenta() {
     if (data.form.id) {
         data.form.put(route('panel.ventas.update', data.form.id), {
@@ -59,15 +68,20 @@ function saveVenta() {
     }
 }
 
-function addPlatillo(item) {
+function addPlatillo() {
+    let index_su = props.sucursales.data.findIndex(item => item.id === data.form.sucursal)
+    let index = props.sucursales.data[index_su].platillos.findIndex(item => item.id === data.form.platillo)
+    let item = props.sucursales.data[index_su].platillos[index]
     let platillo = {
         name: item.name,
         price: item.price,
         total: data.form.platillo_count,
         amout: item.price * data.form.platillo_count
     }
+    data.form.total = data.form.total + platillo.amout
     data.form.platillos.push(platillo)
-    //TODO: Reset del form
+    data.form.platillo = ''
+    data.form.platillo_count = 1
 }
 
 function showSnak(status, text) {
@@ -86,24 +100,35 @@ function showSnak(status, text) {
 
 const permissions = computed(() => usePage().props.auth.permissions);
 
-const tables = computed(() => {
-    let tables = []
+function setTables() {
     let index = props.sucursales.data.findIndex(item => item.id === data.form.sucursal)
     if (index >= 0) {
-        tables = props.sucursales.data[index].tablesOp
+        data.tables = props.sucursales.data[index].tablesOp
     }
-    return tables
-});
+}
 
-const platillos = computed(() => {
-    let platillos = []
+function setPlatillos() {
     let index = props.sucursales.data.findIndex(item => item.id === data.form.sucursal)
     if (index >= 0) {
-        platillos = props.sucursales.data[index].platillos
+        data.platillos = props.sucursales.data[index].platillos
     }
-    return platillos
-});
+}
 
+watch(
+    () => data.form.sucursal,
+    (newValue, oldValue) => {
+        if (newValue !== oldValue) {
+            setTables()
+            setPlatillos()
+        }
+    }
+)
+watch(
+    () => data.form.propina,
+    (newValue, oldValue) => {
+        data.form.amount = data.form.total + parseInt(newValue)
+    }
+)
 </script>
 
 <template>
@@ -206,7 +231,7 @@ const platillos = computed(() => {
                                     :error-messages="data.form.errors.name"
                                     variant="outlined"
                                     density="compact"
-                                    :items="tables"
+                                    :items="data.tables"
                                 ></v-select>
                             </v-col>
                         </v-card>
@@ -216,7 +241,7 @@ const platillos = computed(() => {
                                     <v-select
                                         label="Platillo"
                                         v-model="data.form.platillo"
-                                        :items="platillos"
+                                        :items="data.platillos"
                                         item-title="name"
                                         item-value="id"
                                         variant="outlined"
@@ -236,29 +261,77 @@ const platillos = computed(() => {
                                     <v-btn
                                         color="orange"
                                         block
+                                        @click="addPlatillo()"
                                     >
                                         <Icon icon="mdi:plus" width="24"/>
                                         Agregar
                                     </v-btn>
                                 </v-col>
                             </v-row>
-                            <v-row>
-                                <v-data-table
-                                    :items="data.form.platillos"
-                                ></v-data-table>
-                            </v-row>
+                            <v-data-table
+                                :items="data.form.platillos"
+                            ></v-data-table>
                         </v-card>
                         <v-card v-if="n===3">
-
+                            <v-row justify="center">
+                                <v-date-picker
+                                    title="Selecciona una fecha"
+                                    v-model="data.form.date"
+                                    color="primary"
+                                ></v-date-picker>
+                            </v-row>
+                            <v-row justify="center">
+                                <v-col cols="2">
+                                    <v-text-field
+                                        label="Hora"
+                                        v-model="data.form.platillo_count"
+                                        variant="outlined"
+                                        density="compact"
+                                        type="number"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col cols="2">
+                                    <v-text-field
+                                        label="Minutos"
+                                        v-model="data.form.platillo_count"
+                                        variant="outlined"
+                                        density="compact"
+                                        type="number"
+                                    ></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row justify="center">
+                                <v-col cols="4">
+                                    <v-text-field
+                                        label="Propina"
+                                        v-model="data.form.propina"
+                                        variant="outlined"
+                                        density="compact"
+                                        type="number"
+                                    ></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row justify="center">
+                                <v-col cols="2">
+                                    <h3>Total ${{ data.form.amount }}</h3>
+                                </v-col>
+                            </v-row>
                         </v-card>
                     </v-stepper-window-item>
                 </v-stepper-window>
-                <v-stepper-actions>
+                <v-stepper-actions :disabled="false">
                     <template v-slot:prev>
-                        <v-btn @click="data.step=data.step-1">Anterior</v-btn>
+                        <v-btn variant="flat" color="orange" :disabled="data.step===1" @click="data.step=data.step-1">
+                            Anterior
+                        </v-btn>
                     </template>
                     <template v-slot:next>
-                        <v-btn @click="data.step=data.step+1">Siguiente</v-btn>
+                        <v-btn variant="flat" color="orange" v-if="data.step<3" @click="data.step=data.step+1">
+                            Siguiente
+                        </v-btn>
+                        <v-btn variant="flat" color="orange" v-if="data.step===3">
+                            Guardar
+                        </v-btn>
                     </template>
                 </v-stepper-actions>
             </v-stepper>

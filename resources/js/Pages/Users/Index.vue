@@ -442,6 +442,7 @@ const permissions = computed(() => usePage().props.auth.permissions);
                             @click="closeDialog"
                             color="red"
                             :disabled="data.form.processing"
+                            variant="flat"
                         >
                             Cerrar
                         </v-btn>
@@ -449,6 +450,7 @@ const permissions = computed(() => usePage().props.auth.permissions);
                             @click.prevent="saveUser()"
                             color="green"
                             :loading="data.form.processing"
+                            variant="flat"
                         >
                             Guardar
                         </v-btn>
