@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(UrlGenerator $url): void
     {
         if (env('REDIRECT_HTTPS', false)) {
-            $url->forceScheme('https://');
+            $url->forceScheme('https');
         }
     }
 }
