@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@inertiajs/inertia-vue3": "^0.6.0",
+        "@vuepic/vue-datepicker": "^8.1.0",
         "vuetify": "^3.5.2"
     }
 }

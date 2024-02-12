@@ -23,11 +23,24 @@ class VentaRequest extends FormRequest
     {
         return [
             'number_table' => 'required|numeric',
-            'user_id' => 'required|exists:users,id',
+            'mesero' => 'required|exists:users,id',
+            'platillos' => 'required|array',
+            'platillos.*.id' => 'exists:platillos,id',
+            'platillos.*.total' => 'numeric',
             'propina' => 'required|numeric',
-            'date' => 'required|date_format:Y-m-d',
-            'time' => 'required|date_format:H:i',
-            'sucursal_id' => 'required|exists:sucursals,id',
+            'date' => 'required|date',
+            'time' => 'required',
+            'time.hours' => 'numeric',
+            'time.minutes' => 'numeric',
+            'sucursal' => 'required|exists:sucursals,id',
+            'amount' => 'required|numeric',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'time.required' => 'La hora es obligatoria'
         ];
     }
 }

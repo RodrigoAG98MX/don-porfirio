@@ -17,7 +17,8 @@ class Venta extends Model
         'propina',
         'date',
         'time',
-        'sucursal_id'
+        'sucursal_id',
+        'amount'
     ];
 
     public static function modelData()

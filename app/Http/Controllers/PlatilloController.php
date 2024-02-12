@@ -54,8 +54,8 @@ class PlatilloController extends Controller
         try {
             DB::beginTransaction();
 
-            $hr = $data['hr'] < 10 ? str_pad($data['hr'], 2, "0", STR_PAD_LEFT) : $data['hr'];
-            $min = $data['min'] < 10 ? str_pad($data['min'], 2, "0", STR_PAD_LEFT) : $data['min'];
+            $hr = $data['preparation_time']['hours'] < 10 ? str_pad($data['preparation_time']['hours'], 2, "0", STR_PAD_LEFT) : $data['preparation_time']['hours'];
+            $min = $data['preparation_time']['minutes'] < 10 ? str_pad($data['preparation_time']['minutes'], 2, "0", STR_PAD_LEFT) : $data['preparation_time']['minutes'];
             $time = sprintf('%s:%s', $hr, $min);
             $platillo = Platillo::create([
                 'name' => $data['name'],

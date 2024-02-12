@@ -9,6 +9,7 @@ use App\Models\Platillo;
 use App\Models\Sucursal;
 use App\Models\User;
 use App\Models\Venta;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -55,14 +56,25 @@ class VentaController extends Controller
         try {
             DB::beginTransaction();
 
-            Venta::create([
+            $hr = $data['time']['hours'] < 10 ? str_pad($data['time']['hours'], 2, "0", STR_PAD_LEFT) : $data['time']['hours'];
+            $min = $data['time']['minutes'] < 10 ? str_pad($data['time']['minutes'], 2, "0", STR_PAD_LEFT) : $data['time']['minutes'];
+            $time = sprintf('%s:%s', $hr, $min);
+            $venta = Venta::create([
                 'number_table' => $data['number_table'],
-                'user_id' => $data['user_id'],
+                'user_id' => $data['mesero'],
                 'propina' => $data['propina'],
-                'date' => $data['date'],
-                'time' => $data['time'],
-                'sucursal_id' => $data['sucursal_id'],
+                'date' => Carbon::parse($data['date'])->format('Y-m-d'),
+                'time' => $time,
+                'sucursal_id' => $data['sucursal'],
+                'amount' => $data['amount']
             ]);
+
+            foreach ($data['platillos'] as $platillo) {
+                $venta->consumo()->create([
+                    'platillo_id' => $platillo['id'],
+                    'total' => $platillo['total'],
+                ]);
+            }
 
             DB::commit();
             return redirect()->back()->with('success', 'Venta registrada');

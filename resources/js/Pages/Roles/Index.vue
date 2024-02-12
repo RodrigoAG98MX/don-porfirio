@@ -334,8 +334,7 @@ const permissions = computed(() => usePage().props.auth.permissions);
                 :color="snakbar.color"
             >
                 <Icon style="color:white" :icon="snakbar.icon" width="24"></Icon>
-                {{ snakbar.text }}
-
+                <p class="text-white">{{ snakbar.text }}</p>
                 <template v-slot:actions>
                     <v-btn
                         color="white"

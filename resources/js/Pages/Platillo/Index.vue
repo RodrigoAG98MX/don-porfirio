@@ -3,6 +3,8 @@ import {Head, router, useForm, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Icon} from "@iconify/vue";
 import {computed, reactive, watch} from "vue";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const props = defineProps({
     modelData: Array,
@@ -20,8 +22,7 @@ const data = reactive({
         id: '',
         name: '',
         description: '',
-        hr: 0,
-        min: 0,
+        preparation_time: '',
         cost: 0,
         price: 0,
         sucursal: [],
@@ -320,27 +321,13 @@ const permissions = computed(() => usePage().props.auth.permissions);
                         </v-row>
                         <v-row>
                             <v-col>
-                                <v-text-field
-                                    label="Horas"
-                                    v-model="data.form.hr"
-                                    :error="!!data.form.errors.hr"
-                                    :error-messages="data.form.errors.hr"
-                                    variant="outlined"
-                                    density="compact"
-                                ></v-text-field>
+                                <p class="text-subtitle-2">Tiempo de preparación</p>
+                                <VueDatePicker v-model="data.form.preparation_time" time-picker
+                                               teleport-center></VueDatePicker>
                             </v-col>
                             <v-col>
-                                <v-text-field
-                                    label="Minutos"
-                                    v-model="data.form.min"
-                                    :error="!!data.form.errors.min"
-                                    :error-messages="data.form.errors.min"
-                                    variant="outlined"
-                                    density="compact"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col md="6">
                                 <v-select
+                                    class="mt-5"
                                     label="Sucursales"
                                     v-model="data.form.sucursal"
                                     :error="!!data.form.errors.sucursal"

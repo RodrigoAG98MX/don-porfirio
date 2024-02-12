@@ -3,7 +3,8 @@ import {Head, router, useForm, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Icon} from "@iconify/vue";
 import {computed, reactive, watch} from "vue";
-import {da} from "vuetify/locale";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const props = defineProps({
     sucursales: Object,
@@ -17,19 +18,34 @@ const data = reactive({
         id: '',
         sucursal: '',
         mesero: props.meseros.length === 1 ? props.meseros[0].id : '',
-        mesa: '',
+        number_table: '',
         platillo: '',
         platillo_count: 1,
         platillos: [],
         date: new Date(),
-        hr: 0,
-        min: 0,
+        time: '',
         propina: 0,
         total: 0,
         amount: 0
     }),
     platillos: [],
     tables: [],
+    headers: [
+        {
+            title: 'Nombre',
+            value: 'name',
+        }, {
+            title: 'Precio',
+            value: 'price'
+        }, {
+            title: 'Total',
+            value: 'total',
+        }, {
+            title: 'Monto',
+            value: 'amount'
+        }
+    ],
+    loading: false
 });
 
 const snakbar = reactive({
@@ -41,7 +57,7 @@ const snakbar = reactive({
 
 //TODO: Almaenar venta en el back_end
 function saveVenta() {
-    if (data.form.id) {
+    /*if (data.form.id) {
         data.form.put(route('panel.ventas.update', data.form.id), {
             onSuccess: page => {
                 if (!page.props.status.error) {
@@ -53,35 +69,38 @@ function saveVenta() {
                 }
             }
         })
-    } else {
-        data.form.post(route('panel.ventas.store'), {
-            onSuccess: page => {
-                if (!page.props.status.error) {
-                    data.form.reset()
-                    closeDialog()
-                    showSnak(true, page.props.status.success)
-                } else {
-                    showSnak(false, page.props.status.error)
-                }
+    } else {*/
+    data.form.post(route('panel.ventas.store'), {
+        onSuccess: page => {
+            if (!page.props.status.error) {
+                data.step = 1
+                data.form.reset()
+                showSnak(true, page.props.status.success)
+            } else {
+                showSnak(false, page.props.status.error)
             }
-        })
-    }
+        }
+    })
+    //}
 }
 
 function addPlatillo() {
-    let index_su = props.sucursales.data.findIndex(item => item.id === data.form.sucursal)
-    let index = props.sucursales.data[index_su].platillos.findIndex(item => item.id === data.form.platillo)
-    let item = props.sucursales.data[index_su].platillos[index]
-    let platillo = {
-        name: item.name,
-        price: item.price,
-        total: data.form.platillo_count,
-        amout: item.price * data.form.platillo_count
+    if (data.form.sucursal && data.form.platillo) {
+        let index_su = props.sucursales.data.findIndex(item => item.id === data.form.sucursal)
+        let index = props.sucursales.data[index_su].platillos.findIndex(item => item.id === data.form.platillo)
+        let item = props.sucursales.data[index_su].platillos[index]
+        let platillo = {
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            total: data.form.platillo_count,
+            amount: item.price * data.form.platillo_count
+        }
+        data.form.total = data.form.total + platillo.amount
+        data.form.platillos.push(platillo)
+        data.form.platillo = ''
+        data.form.platillo_count = 1
     }
-    data.form.total = data.form.total + platillo.amout
-    data.form.platillos.push(platillo)
-    data.form.platillo = ''
-    data.form.platillo_count = 1
 }
 
 function showSnak(status, text) {
@@ -101,10 +120,12 @@ function showSnak(status, text) {
 const permissions = computed(() => usePage().props.auth.permissions);
 
 function setTables() {
+    data.loading = true
     let index = props.sucursales.data.findIndex(item => item.id === data.form.sucursal)
     if (index >= 0) {
         data.tables = props.sucursales.data[index].tablesOp
     }
+    data.loading = false
 }
 
 function setPlatillos() {
@@ -226,12 +247,13 @@ watch(
                             <v-col>
                                 <v-select
                                     label="Mesa"
-                                    v-model="data.form.name"
-                                    :error="!!data.form.errors.name"
-                                    :error-messages="data.form.errors.name"
+                                    v-model="data.form.number_table"
+                                    :error="!!data.form.errors.number_table"
+                                    :error-messages="data.form.errors.number_table"
                                     variant="outlined"
                                     density="compact"
                                     :items="data.tables"
+                                    :loading="data.loading"
                                 ></v-select>
                             </v-col>
                         </v-card>
@@ -269,53 +291,50 @@ watch(
                                 </v-col>
                             </v-row>
                             <v-data-table
+                                :headers="data.headers"
                                 :items="data.form.platillos"
                             ></v-data-table>
                         </v-card>
                         <v-card v-if="n===3">
-                            <v-row justify="center">
-                                <v-date-picker
-                                    title="Selecciona una fecha"
-                                    v-model="data.form.date"
-                                    color="primary"
-                                ></v-date-picker>
-                            </v-row>
-                            <v-row justify="center">
-                                <v-col cols="2">
-                                    <v-text-field
-                                        label="Hora"
-                                        v-model="data.form.platillo_count"
-                                        variant="outlined"
-                                        density="compact"
-                                        type="number"
-                                    ></v-text-field>
-                                </v-col>
-                                <v-col cols="2">
-                                    <v-text-field
-                                        label="Minutos"
-                                        v-model="data.form.platillo_count"
-                                        variant="outlined"
-                                        density="compact"
-                                        type="number"
-                                    ></v-text-field>
-                                </v-col>
-                            </v-row>
-                            <v-row justify="center">
-                                <v-col cols="4">
-                                    <v-text-field
-                                        label="Propina"
-                                        v-model="data.form.propina"
-                                        variant="outlined"
-                                        density="compact"
-                                        type="number"
-                                    ></v-text-field>
-                                </v-col>
-                            </v-row>
-                            <v-row justify="center">
-                                <v-col cols="2">
-                                    <h3>Total ${{ data.form.amount }}</h3>
-                                </v-col>
-                            </v-row>
+                            <v-sheet height="450">
+                                <v-row justify="center">
+                                    <v-col md="4">
+                                        <p class="text-subtitle-2">Fecha</p>
+                                        <VueDatePicker v-model="data.form.date" :enable-time-picker="false"
+                                                       locale="es-MX" teleport-center format="d-mm-y"></VueDatePicker>
+                                    </v-col>
+                                </v-row>
+                                <v-row justify="center">
+                                    <v-col md="4">
+                                        <p class="text-subtitle-2">Hora</p>
+                                        <VueDatePicker v-model="data.form.time" time-picker
+                                                       locale="es-MX" teleport-center></VueDatePicker>
+                                        <span v-if="data.form.errors.time"
+                                              class="text-red">{{ data.form.errors.time }}</span>
+                                    </v-col>
+                                </v-row>
+                                <v-row justify="center">
+                                    <v-col cols="4">
+                                        <v-text-field
+                                            label="Propina"
+                                            v-model="data.form.propina"
+                                            variant="outlined"
+                                            density="compact"
+                                            type="number"
+                                        ></v-text-field>
+                                    </v-col>
+                                </v-row>
+                                <v-row justify="center">
+                                    <v-col cols="1">
+                                        <p class="text-center text-subtitle-2">Subtotal ${{ data.form.total }}</p>
+                                    </v-col>
+                                </v-row>
+                                <v-row justify="center">
+                                    <v-col cols="1">
+                                        <p class="text-center text-h6">Total ${{ data.form.amount }}</p>
+                                    </v-col>
+                                </v-row>
+                            </v-sheet>
                         </v-card>
                     </v-stepper-window-item>
                 </v-stepper-window>
@@ -329,7 +348,8 @@ watch(
                         <v-btn variant="flat" color="orange" v-if="data.step<3" @click="data.step=data.step+1">
                             Siguiente
                         </v-btn>
-                        <v-btn variant="flat" color="orange" v-if="data.step===3">
+                        <v-btn variant="flat" color="orange" v-if="data.step===3" @click="saveVenta"
+                               :loading="data.form.processing">
                             Guardar
                         </v-btn>
                     </template>
@@ -341,8 +361,7 @@ watch(
                 :color="snakbar.color"
             >
                 <Icon style="color:white" :icon="snakbar.icon" width="24"></Icon>
-                {{ snakbar.text }}
-
+                <p class="text-white">{{ snakbar.text }}</p>
                 <template v-slot:actions>
                     <v-btn
                         color="white"
