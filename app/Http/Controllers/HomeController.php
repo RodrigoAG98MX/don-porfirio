@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sucursal;
 use App\Models\User;
 use App\Models\Venta;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -15,6 +16,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         if (auth()->user()->hasRole('Administrador')) {
+            $max_mesas = Sucursal::select('tables')->orderBy('tables', 'desc')->first()->tables;
             $ventas = Venta::query();
 
             $ventas->select(
@@ -62,7 +64,8 @@ class HomeController extends Controller
                     ]
                 ],
                 'meseros' => User::role('Mesero')->get(),
-                'querys' => $querys
+                'querys' => $querys,
+                'mesas' => $this->setMesas($max_mesas)
             ]);
         } else {
             return Inertia::render('Home');
@@ -111,5 +114,14 @@ class HomeController extends Controller
             '$color' => $color,
         ]);
         return $pdf->download(sprintf('%s-ventas.pdf', $date));
+    }
+
+    protected function setMesas($mesas)
+    {
+        $op = [];
+        for ($i = 0; $i < $mesas; $i++) {
+            $op[] = ['title' => $i + 1, 'value' => $i + 1];
+        }
+        return $op;
     }
 }

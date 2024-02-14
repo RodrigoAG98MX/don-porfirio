@@ -335,12 +335,12 @@ watch(
                                     </v-col>
                                 </v-row>
                                 <v-row justify="center">
-                                    <v-col cols="1">
+                                    <v-col cols="3" md="1">
                                         <p class="text-center text-subtitle-2">Subtotal ${{ data.form.total }}</p>
                                     </v-col>
                                 </v-row>
                                 <v-row justify="center">
-                                    <v-col cols="1">
+                                    <v-col cols="3" md="1">
                                         <p class="text-center text-h6">Total ${{ data.form.amount }}</p>
                                     </v-col>
                                 </v-row>

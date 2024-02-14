@@ -16,7 +16,7 @@ const permissions = computed(() => usePage().props.auth.permissions);
         <v-app-bar scroll-behavior="elevate" color="grey-darken-3">
             <template v-slot:prepend>
                 <v-menu
-                    open-on-hover
+                    open-on-click
                 >
                     <template v-slot:activator="{ props }">
                         <v-btn
@@ -27,6 +27,12 @@ const permissions = computed(() => usePage().props.auth.permissions);
                     </template>
 
                     <v-list>
+                        <v-list-item :href="route('panel.dashboard')">
+                            <template v-slot:prepend>
+                                <Icon icon="mdi:home" width="24" class="mr-2"/>
+                            </template>
+                            <v-list-item-title>Panel</v-list-item-title>
+                        </v-list-item>
                         <v-list-item v-if="permissions.includes('browse-roles')" :href="route('panel.roles.index')">
                             <template v-slot:prepend>
                                 <Icon icon="carbon:user-role" width="24" class="mr-2"/>

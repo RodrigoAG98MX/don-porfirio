@@ -30,7 +30,8 @@ const options = reactive({
 const props = defineProps({
     ventas: Object,
     meseros: Array,
-    querys: Object
+    querys: Object,
+    mesas: Array
 })
 
 const data = reactive({
@@ -108,7 +109,7 @@ function send() {
                 <v-card-text>
                     <span class="text-caption">Aplica los filtros necesarios y da click sobre el botón buscar</span>
                     <v-row>
-                        <v-col>
+                        <v-col cols="12" md="3">
                             <p class="text-subtitle-2">Fecha</p>
                             <VueDatePicker
                                 v-model="data.fecha"
@@ -116,7 +117,7 @@ function send() {
                                 format="d-MM-y"
                             ></VueDatePicker>
                         </v-col>
-                        <v-col>
+                        <v-col cols="12" md="3">
                             <v-select
                                 class="mt-5"
                                 label="Mesero"
@@ -129,17 +130,17 @@ function send() {
                                 clearable
                             ></v-select>
                         </v-col>
-                        <v-col>
+                        <v-col cols="12" md="2">
                             <v-select
                                 class="mt-5"
                                 label="Mesa"
                                 v-model="data.mesa"
                                 variant="outlined"
                                 density="compact"
-                                :items="[]"
+                                :items="mesas"
                             ></v-select>
                         </v-col>
-                        <v-col>
+                        <v-col cols="12" md="2">
                             <v-text-field
                                 class="mt-5"
                                 label="Monto"
@@ -149,7 +150,7 @@ function send() {
                                 type="number"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="2">
+                        <v-col cols="12" md="2">
                             <v-btn
                                 class="mt-5"
                                 color="primary"
@@ -167,7 +168,7 @@ function send() {
                 </v-card-text>
                 <v-card-actions>
                     <v-row justify="end">
-                        <v-col cols="3">
+                        <v-col cols="12" md="3">
                             <v-btn
                                 :href="route('panel.pdf',params)"
                                 target="_blank"
