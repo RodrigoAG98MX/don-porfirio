@@ -26,7 +26,8 @@ const data = reactive({
         cost: 0,
         price: 0,
         sucursal: [],
-    })
+    }),
+    loading: false
 });
 
 const snakbar = reactive({
@@ -135,6 +136,7 @@ function getFullUrl(link = route('panel.platillos.index')) {
     if (data.search) {
         params.search = data.search
     }
+    data.loading = true
     router.get(route('panel.platillos.index', params))
 }
 
@@ -145,6 +147,7 @@ watch(
         let urlParams = new URLSearchParams(queryString);
         //TODO: Generar un objeto e ir comprobando con un has si tiene la propiedad para irla agregando al objeto
         if (newValue !== oldValue) {
+            data.loading = true
             router.get(route('panel.platillos.index', {
                 'perPage': newValue
             }))
@@ -184,6 +187,7 @@ const permissions = computed(() => usePage().props.auth.permissions);
                             label="Buscar"
                             density="compact"
                             @keyup.enter="getFullUrl()"
+                            placeholder="escribe y presiona enter"
                         >
                             <template v-slot:prepend>
                                 <Icon icon="mdi:search" width="24"/>
@@ -216,6 +220,9 @@ const permissions = computed(() => usePage().props.auth.permissions);
                 :headers="modelData"
                 :items="platillos.data"
                 density="compact"
+                :loading="data.loading"
+                loading-text="Cargando..."
+                no-data-text="No hay resultados"
             >
                 <template v-slot:item.actions="{item}">
                     <v-btn v-if="permissions.includes('update-platillos')" icon @click="openDialog(item)"

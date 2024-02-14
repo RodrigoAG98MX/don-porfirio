@@ -300,15 +300,25 @@ watch(
                                 <v-row justify="center">
                                     <v-col md="4">
                                         <p class="text-subtitle-2">Fecha</p>
-                                        <VueDatePicker v-model="data.form.date" :enable-time-picker="false"
-                                                       locale="es-MX" teleport-center format="d-mm-y"></VueDatePicker>
+                                        <VueDatePicker
+                                            v-model="data.form.date"
+                                            :enable-time-picker="false"
+                                            locale="es-MX"
+                                            teleport-center format="d-MM-y"
+                                        ></VueDatePicker>
                                     </v-col>
                                 </v-row>
                                 <v-row justify="center">
                                     <v-col md="4">
                                         <p class="text-subtitle-2">Hora</p>
-                                        <VueDatePicker v-model="data.form.time" time-picker
-                                                       locale="es-MX" teleport-center></VueDatePicker>
+                                        <VueDatePicker
+                                            v-model="data.form.time"
+                                            time-picker
+                                            locale="es-MX"
+                                            teleport-center
+                                            :min-time="{ hours: 9, minutes: 0 }"
+                                            :max-time="{ hours: 18, minutes: 1 }"
+                                        ></VueDatePicker>
                                         <span v-if="data.form.errors.time"
                                               class="text-red">{{ data.form.errors.time }}</span>
                                     </v-col>

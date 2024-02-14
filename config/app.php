@@ -170,6 +170,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         //App\Providers\TelescopeServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -182,6 +183,10 @@ return [
     | the aliases are "lazy" loaded so they don't hinder performance.
     |
     */
+
+    /*
+     * Lic. Rodrigo Aguilar García
+     */
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,

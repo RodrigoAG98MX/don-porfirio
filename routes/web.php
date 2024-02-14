@@ -33,6 +33,7 @@ Route::get('/', function () {
 
 Route::prefix('panel')->name('panel.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('/pdf', [HomeController::class, 'pdf'])->name('pdf');
     Route::resource('roles', RoleController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('users', UserController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('sucursales', SucursalController::class)->only(['index', 'store', 'update', 'destroy']);
